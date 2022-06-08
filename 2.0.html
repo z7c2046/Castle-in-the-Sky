@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天空之城</title>
+    <style>
+        body {
+            scroll-behavior: smooth;
+            background-color: #cd353b;
+            /* background-color: #e3e5e5; */
+            display: grid;
+            grid-template-areas:
+                "head"
+                "container"
+                "banner"
+            ;
+            row-gap: 10px;
+        }
+
+        .head {
+            grid-template-areas: head;
+        }
+
+        .container {
+            grid-template-areas: container;
+        }
+
+        .banner {
+            grid-template-areas: banner;
+        }
+
+        /* =========================================== */
+        .head {
+            display: grid;
+            align-items: center;
+            justify-items: center;
+            margin-bottom: 20px;
+        }
+
+        .head h1 {
+            color: white;
+            margin: 30px auto;
+        }
+
+        .head .video {
+            margin: 20px 0px;
+        }
+
+        .container,
+        .banner {
+            position: relative;
+            /* overflow: hidden; */
+        }
+
+        .container .commentBox,
+        .banner .commentBox1 {
+            width: 300px;
+            background-color: rgb(236, 236, 236);
+            border-radius: 5px;
+            margin: 0px 20px 20px 20px;
+            /* 上右下左 */
+            padding: 10px;
+            /* word-wrap: break-word; */
+            /* 自动换行 */
+            float: left;
+            border: 0.8px solid black;
+            display: grid;
+            grid-template-areas:
+                "profile comment comment"
+                "profile nickname nickname"
+                "profile timestamp timestamp"
+            ;
+            column-gap: 10px;
+        }
+
+        .commentBox:hover {
+            font-weight: bold;
+            transform: scaleX(1.07) scaleY(1.07);
+            transition: transform 0.5s;
+        }
+
+        .commentBox1:hover {
+            font-weight: bold;
+            transform: scaleX(1.07) scaleY(1.07);
+            transition: transform 0.5s;
+        }
+
+        /* =========================================== */
+        .commentBox div:nth-child(1) {
+            grid-area: profile;
+        }
+
+        .commentBox div:nth-child(1) img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-top: 10px;
+            margin-left: 5px;
+        }
+
+        .commentBox div:nth-child(2) {
+            grid-area: comment;
+        }
+
+        .commentBox div:nth-child(2) p {
+            margin-top: 0;
+        }
+
+        .commentBox div:nth-child(3) {
+            grid-area: nickname;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .commentBox div:nth-child(4) {
+            grid-area: timestamp;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .commentBox1 div:nth-child(1) {
+            grid-area: profile;
+        }
+
+        .commentBox1 div:nth-child(1) img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-top: 10px;
+            margin-left: 5px;
+        }
+
+        .commentBox1 div:nth-child(2) {
+            grid-area: comment;
+        }
+
+        .commentBox1 div:nth-child(2) p {
+            margin-top: 0;
+        }
+
+        .commentBox1 div:nth-child(3) {
+            grid-area: nickname;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .commentBox1 div:nth-child(4) {
+            grid-area: timestamp;
+            text-align: right;
+            font-size: 14px;
+        }
+
+
+        h2 {
+            color: white;
+            height: 40px;
+            /* border: 0.8px solid black; */
+            /* 测试时加的边框，为了看清楚高度对布局的影响 */
+            margin: 20px 0px 20px 0px;
+            /* 上右下左 */
+        }
+
+
+        @media only screen and (min-width: 100px) and (max-width: 741px) {
+            .video {
+                width: 310px;
+                height: 233px;
+            }
+        }
+
+        @media only screen and (min-width: 740px) and (max-width: 899px) {
+            .video {
+                width: 400px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="head">
+        <h1>天空の城</h1>
+        <iframe class="video" id="inlineFrameExample" title="Inline Frame Example" width="800px" height="500px"
+            src="https://player.bilibili.com/player.html?aid=504068414&bvid=BV1Dg411u7Sx&cid=367583726&page=1">
+        </iframe>
+    </div>
+
+    <div id="container" class="container">
+        <h2 class="hotCommentsTittle">丨熱門評論</h2>
+        <div class="commentBox">
+        </div>
+    </div>
+
+    <div id="banner" class="banner">
+        <h2 class="commentsTittle">丨更多評論</h2>
+        <div class="commentBox1">
+        </div>
+    </div>
+
+    <script>
+        var container = document.getElementById("container"); //评论区的容器
+        var commentBox = document.getElementsByClassName("commentBox"); //如英语所示：每一个评论的盒子，拿来装头像，评论，昵称和日期这4个元素
+        var banner = document.getElementById("banner"); //更多评论的容器
+        var commentBox1 = document.getElementsByClassName("commentBox1");
+
+        function createElements(fatherElement, needElement) { //函数传参。传父级元素进去，和要添加的元素
+            var needElement = document.createElement(needElement); //创建div元素(这个创建的是评论的div，之后还需要用户名，头像，日期)
+            fatherElement.appendChild(needElement); //添加到节点
+        }
+        async function getData() {
+            const response = await fetch("https://netease-cloud-music-api-zeta-plum.vercel.app/comment/music?id=26508186");
+            const data = await response.json();
+
+            console.log(data);
+
+            function godDamnFuckingCreate() { //操他媽的全都是循環創建，真几把麻烦TMD
+                /* 热门评论 */
+                for (let i = 0; i < data.hotComments.length; i++) {
+                    createElements(container, "div");
+                    container.getElementsByTagName("div")[i].classList.add(
+                        "commentBox"); //给刚刚新创建的div加上commentBox类名
+                }
+                for (let j = 0; j < 4; j++) { //创建4个div元素
+                    for (let i = 0; i < data.hotComments.length; i++) {
+                        createElements(commentBox[i], "div");
+                    }
+                }
+                /* 近期评论 */
+                for (let i = 0; i < data.comments.length; i++) {
+                    createElements(banner, "div");
+                    banner.getElementsByTagName("div")[i].classList.add(
+                        "commentBox1");
+                }
+
+                for (let j = 0; j < 4; j++) { //创建4个div元素
+                    for (let i = 0; i < data.comments.length; i++) {
+                        createElements(commentBox1[i], "div");
+                    }
+                }
+                for (let i = 0; i < data.hotComments.length; i++) {
+                    createElements(commentBox[i].getElementsByTagName("div")[0], "img");
+                    createElements(commentBox[i].getElementsByTagName("div")[1], "p");
+                    createElements(commentBox[i].getElementsByTagName("div")[2], "span");
+                    createElements(commentBox[i].getElementsByTagName("div")[3], "span");
+                }
+                for (let i = 0; i < data.comments.length; i++) {
+                    createElements(commentBox1[i].getElementsByTagName("div")[0], "img");
+                    createElements(commentBox1[i].getElementsByTagName("div")[1], "p");
+                    createElements(commentBox1[i].getElementsByTagName("div")[2], "span");
+                    createElements(commentBox1[i].getElementsByTagName("div")[3], "span");
+                }
+                /* ================================================ */
+
+                for (let i = 0; i < data.hotComments.length; i++) { //在上一步的div元素里创建img标签（头像）顺便注入数据
+                    commentBox[i].getElementsByTagName("div")[0].getElementsByTagName("img")[0].src =
+                        data.hotComments[i].user.avatarUrl;
+                    commentBox[i].getElementsByTagName("div")[1].getElementsByTagName("p")[0].innerHTML =
+                        data.hotComments[i].content;
+                    commentBox[i].getElementsByTagName("div")[2].getElementsByTagName("span")[0].innerHTML =
+                        "-" + data.hotComments[i].user.nickname;
+                    commentBox[i].getElementsByTagName("div")[3].getElementsByTagName("span")[0].innerHTML =
+                        data.hotComments[i].timeStr;
+                }
+                for (let i = 0; i < data.comments.length; i++) { //在上一步的div元素里创建img标签（头像）顺便注入数据
+                    commentBox1[i].getElementsByTagName("div")[0].getElementsByTagName("img")[0].src =
+                        data.comments[i].user.avatarUrl;
+                    commentBox1[i].getElementsByTagName("div")[1].getElementsByTagName("p")[0].innerHTML =
+                        data.comments[i].content;
+                    commentBox1[i].getElementsByTagName("div")[2].getElementsByTagName("span")[0].innerHTML =
+                        "-" + data.comments[i].user.nickname;
+                    commentBox1[i].getElementsByTagName("div")[3].getElementsByTagName("span")[0].innerHTML =
+                        data.comments[i].timeStr;
+                }
+            }
+            godDamnFuckingCreate();
+            waterfalls("container", "commentBox"); //瀑布流函数
+            waterfalls("banner", "commentBox1");
+        }
+        //瀑布流函数
+        function waterfalls(father, son) {
+            //一、父盒子定位
+            //1.1 获取内外层容器标签
+            var outContainer = document.getElementById(father);
+            var innerContainer = outContainer.getElementsByClassName(son);
+
+            var boxWidth = innerContainer[0].offsetWidth + 40; //1.2 盒子宽度------------后面+40是通过css给box设置的左右两边的margin
+            var screenWidth = document.body.clientWidth; //1.3 当前屏幕宽度
+            var columns = parseInt(screenWidth / boxWidth); //1.4 列数
+            //1.5 父盒子居中，给父盒子设置宽度
+            outContainer.style.width = columns * boxWidth + 'px';
+            outContainer.style.margin = '0 auto 50px';
+
+            //二、子盒子定位（从第二行开始）
+            //2.1 定义变量
+            //盒子高度、盒子高度数组、最矮盒子高度、最矮盒子高度的索引
+            var boxHeight, boxHeightArray = [],
+                minBoxHeight, minIndex;
+            //2.2 遍历所有的盒子
+            for (let i = 0; i < innerContainer.length; i++) {
+
+                boxHeight = innerContainer[i].offsetHeight + 20; //盒子高度-----------后面+20是通过css给box设置的下边margin
+                //2.3 判断是否是第一行
+                if (i < columns) {
+                    boxHeightArray.push(boxHeight); //2.4 盒子高度存进数组
+                } else {
+                    //2.5 剩余行做定位
+                    minBoxHeight = boxHeightArray[findIndex(boxHeightArray)]; //2.6 取出数组中最矮盒子的高度
+                    minIndex = findIndex(boxHeightArray); //2.7 取出最矮盒子再数组中的索引
+
+                    /* 新加的！！！！作用是想要给父级元素撑开高度，以便后期布局，见代码255行*/
+                    var maxBoxHeight = boxHeightArray[findMaxIndex(boxHeightArray)];
+                    var maxIndex = findMaxIndex(boxHeightArray);
+
+                    //2.8 剩余盒子的定位（第二行开始）
+                    innerContainer[i].style.position = "absolute";
+                    innerContainer[i].style.left = minIndex * boxWidth + 'px';
+                    innerContainer[i].style.top = minBoxHeight + 80 +
+                        'px'; //这里+80是我将标题“热门评论”移进来放在了第一行，所以要加上标题的高度及上下margin
+
+                    boxHeightArray[minIndex] += boxHeight; //2.9 更新高度
+
+                    /* 原理是瀑布流布局用的是absolute定位，而父级元素是relative定位，
+                    无法撑开整个父级元素的高度，脱离了应有的文档流，
+                    所以我直接为父级元素在循环结束设置高度=最高的盒子的高度
+                     */
+                    outContainer.style.height = maxBoxHeight + 80 - 20 + 'px';
+                }
+
+            }
+            /* 可以传递一个「数组」类型的参数
+            作用是找到数组中的最小值
+            并且特别注意返回的是最小值的「下标」 */
+            function findIndex(arr) {
+                var j = 0;
+                for (i in arr) {
+                    if (arr[j] > arr[i])
+                        j = i;
+                }
+                return j;
+            }
+            /* 传递一个「数组」类型的参数，返回其最大值的「下标」 */
+            function findMaxIndex(arr) {
+                var j = 0;
+                for (i in arr) {
+                    if (arr[j] < arr[i])
+                        j = i;
+                }
+                return j;
+            }
+            /* 测试 */
+            // var list = [1, 2, 55, 66, 4, 78, 3, 5, 8, 96, 7, 5];
+            // findMaxIndex(list);
+
+            function getStyle(obj, attr) { //获取非行间样式，obj是对象，attr是值
+                if (obj.currentStyle) { //针对ie获取非行间样式
+                    return obj.currentStyle[attr];
+                } else {
+                    return getComputedStyle(obj, false)[attr]; //针对非ie
+                };
+            };
+            // getStyle(document.querySelector("hotCommentsTittle"), "margin")
+        }
+
+        //页面加载时，就调用接口数据
+        window.onload = function () {
+            getData();
+        }
+        //当页面尺寸发生变化时，触发函数，实现响应式
+        window.onresize = function () {
+            waterfalls("container", "commentBox");
+            waterfalls("banner", "commentBox1");
+        }
+    </script>
+</body>
+
+</html>
