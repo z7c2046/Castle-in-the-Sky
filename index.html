@@ -326,7 +326,11 @@
                     无法撑开整个父级元素的高度，脱离了应有的文档流，
                     所以我直接为父级元素在循环结束设置高度=最高的盒子的高度
                      */
-                    outContainer.style.height = maxBoxHeight + 80 - 20 + 'px';
+                    if (columns == 1) {
+                        outContainer.style.height = maxBoxHeight + boxHeight + 80 - 20 + 'px';
+                    } else {
+                        outContainer.style.height = maxBoxHeight + 80 - 20 + 'px';
+                    }
                 }
 
             }
