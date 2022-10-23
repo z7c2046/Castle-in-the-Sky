@@ -37,12 +37,12 @@ moreButton.onclick = () => {
     everyIndex = index * value - 20;
     limitValue = index * value;
     // alert("理论上取出评论的条数:" + limitValue);
-    getData(186016, limitValue);
+    getData(26508186, limitValue);
 };
 
 //页面加载时，就调用接口数据
 window.onload = function () {
-    getData(186016, 20); //梵高先生的id
+    getData(26508186, 20); //梵高先生的id
 };
 //当页面尺寸发生变化时，触发瀑布流函数，实现响应式
 window.onresize = function () {
